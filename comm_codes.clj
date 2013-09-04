@@ -1,0 +1,13 @@
+(ns comm-codes)
+
+(def ALIVE            1 )
+(def START            2 )
+(def REQUEST_POSITION 3 )
+(def POSITION         4 )
+(def KILL             5 )
+(def ROBOT_DYING      6 )
+(def GET_OBSTACLES    7 )
+(def OBS_READINGS     8 )
+(def PAUSE            9 )
+(def MOVE             10 )
+(def SPIN             11 )
