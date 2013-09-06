@@ -14,7 +14,6 @@
     ([id host port]
         {:id id
          :channel (create-client-datagram-channel host port)
-         ;:queued-msgs (atom clojure.lang.PersistentQueue/EMPTY) }))
          :queued-msgs clojure.lang.PersistentQueue/EMPTY }))
 
 (defn clear-robot-comm-msg-queue [comm]
@@ -45,7 +44,6 @@
          (first (:queued-msgs comm))]
         (let [msg (recv-from (:channel comm))
               msg (and msg (ensure-type (unmarshall (:data msg))))]
-            ;(if msg (println "recv'd msg:" msg))
             [comm msg])))
 
 (defn wait-for-msg [comm wait-for]
@@ -53,11 +51,8 @@
         (if-let [msg (recv-from (:channel comm))]
             (let [msg (unmarshall (:data msg))]
                 (if (= (first msg) wait-for)
-                    ;(do (println "returning waited for msg:" msg)
-                        [comm msg];)
-                    ;(do (println "putting msg on queue:" (ensure-type msg))
+                        [comm msg]
                         (recur (add-msg-to-robot-comm-msg-queue comm (ensure-type msg)))
-                        ;)
                 ))
             (recur comm))))
 
@@ -103,43 +98,3 @@
 (defn perform-comm-shutdown [comm]
     (send-death-msg comm)
     (close-datagram-channel (:channel comm)))
-
-; server
-; (import java.net.InetSocketAddress)
-; (import java.nio.channels.DatagramChannel)
-; (import java.nio.ByteBuffer)
-
-; (def channel1 (DatagramChannel/open))
-; (.configureBlocking channel1 false)
-; (.bind (.socket channel1) (InetSocketAddress. 49999))
-; (def channel1-buf (ByteBuffer/allocate 1024))
-
-; (.clear channel1-buf)
-; (def sock-addr (.receive channel1 channel1-buf))
-; (.flip channel1-buf)
-; (let [msg-size (.getInt channel1-buf)
-;       data-buf (byte-array msg-size)]
-;     (.get channel1-buf data-buf)
-;     (def msg (String. data-buf)))
-
-
-
-
-; client
-; (import java.net.InetSocketAddress)
-; (import java.nio.channels.DatagramChannel)
-; (import java.nio.ByteBuffer)
-; (def channel1 (DatagramChannel/open))
-; (def host-sock-addr (InetSocketAddress. "localhost" 49999))
-; (def channel1-buf (ByteBuffer/allocate 1024))
-
-; (.clear channel1-buf)
-; (let [data "this is my msg"]
-;     (-> channel1-buf
-;         (.putInt (.length data))
-;         (.put (.getBytes data))))
-; (.flip channel1-buf)
-; (.send channel1 channel1-buf host-sock-addr)
-
-
-;#<InetSocketAddress /127.0.0.1:56876>

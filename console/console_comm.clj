@@ -4,13 +4,6 @@
 (use 'comm-codes)
 (use 'io-utils)
 
-; (def handlers { POSITION          :update-robot-pos
-;                 REQUEST_POSITION  :get-robot-pos
-;                 GET_OBSTACLES     :get-obs-readings
-;                 ROBOT_DYING       :robot-dying
-;                 MOVE              :move-robot
-;                 SPIN              :spin-robot })
-
 (defn create-console-comm []
     {:channel nil
      :addresses {} })
@@ -54,7 +47,6 @@
     (send-to (:channel comm) (get (:addresses comm) id) (marshall data)))
 
 (defn send-to-all-robots [comm data]
-    ;(println "send-to-all-robots:" data)
     (doseq [id (keys (:addresses comm))] (send-to-robot comm id data)))
 
 (defn send-start-msg [comm id]

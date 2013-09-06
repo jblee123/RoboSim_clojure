@@ -48,7 +48,6 @@
 
 (defn repaint-display []
     (.repaint (get-display-canvas-panel)))
-; (defn repaint-display [] nil)
 
 (defn set-display-robots []
     (let [robots (vals (:robots (:simulator @the-state)))]
@@ -120,25 +119,16 @@
                    :move-robot       handle-move-robot
                    :spin-robot       handle-spin-robot })
 
-(defn do-handle-comm-msg []
+(defn handle-comm-msg []
     (if-let [msg (get-next-msg (:comm @the-state))]
         (let [{addr :addr msg :data} msg
-              ;_ (println "msg:" msg)
-              handler (get msg-handlers (first msg))
-              new-state (if (= handler handle-robot-alive)
-                            (handler @the-state msg addr)
-                            (handler @the-state msg))]
+               handler (get msg-handlers (first msg))
+               new-state (if (= handler handle-robot-alive)
+                             (handler @the-state msg addr)
+                             (handler @the-state msg))]
             (reset! the-state new-state)
             (set-display-robots)
             msg)))
-
-(defn handle-comm-msg []
-    ;(println "recv at time:" (mod (.getTime (new java.util.Date)) 100000))
-    (let [start-time (.getTime (new java.util.Date))
-          ret-val (do-handle-comm-msg)
-          end-time (.getTime (new java.util.Date))]
-        (if ret-val (println "handle-comm-msg time:" (- end-time start-time) ret-val))
-        ret-val))
 
 (defn schedule-handle-comm-msg []
     (schedule-action (fn []
@@ -173,7 +163,7 @@
 (init-robo-sim (get-env-for-test-goto))
 
 
-;(.exec (Runtime/getRuntime) "clojure -cp . robot/goto_test_robot.clj")
+(.exec (Runtime/getRuntime) "clojure -cp . robot/goto_test_robot.clj")
 
 
 (loop []

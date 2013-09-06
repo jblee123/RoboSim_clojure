@@ -23,19 +23,14 @@
 (defn compile-behaviors [& behaviors] (list (to-behavior-map behaviors) (map first behaviors)))
 
 (defn run-all-behaviors-reduce-fn [so-far behavior-key]
-    ; (println "#################################")
-    ; (println "getting output for" (:name behavior-key))
-    ;(print-behaviors (first so-far))
     (let [[behavior-map interface comm] so-far
           output-func (:output-func behavior-key)
           behavior-data (behavior-map behavior-key)
           [behavior-data comm] (output-func behavior-data behavior-map interface comm)]
-        ;(println "computed an output for" (:name behavior-key) "of" (:output behavior-data))
         [(assoc behavior-map behavior-key behavior-data) interface comm]))
 
 (defn run-all-behaviors [behavior-list behavior-map interface comm]
     (reduce run-all-behaviors-reduce-fn [behavior-map interface comm] behavior-list))
-    ;(reduce #(assoc %1 %2 ((:output-func %2) (%1 %2) %1)) behavior-map behavior-list))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; avoid obs stuff

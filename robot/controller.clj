@@ -2,11 +2,7 @@
 
 (use 'robot.robot-comm)
 
-;(require '[robot.behaviors :as behaviors])
 (use 'robot.behaviors)
-
-;(defn add-controller-behaviors [controller behavior-map behavior-list]
-;    (assoc controller {:behavior-map behavior-map :behavior-list behavior-list}))
 
 (defn get-controller-paused [controller]
     (:paused controller))
@@ -38,12 +34,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn handle-msg [controller comm msg]
-    ;(println "msg:" msg)
     ((get console-handlers (first msg)) controller comm msg))
 
 (defn handle-msgs [controller comm]
     (let [[comm msg] (get-next-msg comm)]
-        ;(println "  msg:" msg)
         (if msg
             (handle-msgs (handle-msg controller comm msg) comm)
             [controller comm])))
@@ -62,12 +56,7 @@
                                                                        comm)]
                     (recur controller interface comm behavior-map))))))
 
-
-
-
 (defn create-robot-controller []
     {:behavior-list []
      :behavior-map {}
      :paused true})
-     ; :get-controller-paused get-controller-paused
-     ; :set-controller-paused set-controller-paused})

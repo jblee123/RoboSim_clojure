@@ -21,8 +21,5 @@
         ((:set-position interface) communicator pos)
         {:communicator communicator :controller controller :interface interface}))
 
-;(defn set-robot-behaviors [robot behavior-map behavior-list]
-;    (assoc robot {:controller (add-controller-behaviors (:controller robot) behavior-map behavior-list)}))
-
 (defn run-robot [controller comm interface behavior-map behavior-list]
     (run-controller controller comm interface behavior-map behavior-list))

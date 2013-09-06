@@ -1,8 +1,6 @@
 (in-ns 'robot.behaviors)
 
 (defn get-result-from-run-all [behavior-list behavior-map]
-    ; (print behavior-list)
-    ; (print behavior-map)
     (:output ((first (run-all-behaviors behavior-list behavior-map nil nil)) (last behavior-list))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
