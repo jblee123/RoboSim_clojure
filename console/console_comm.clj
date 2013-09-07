@@ -1,4 +1,6 @@
-(ns console.console-comm)
+(ns console.console-comm
+    (:require (geom_utils))
+    (:import (geom_utils Vector)))
 
 (use 'robot-position)
 (use 'comm-codes)
@@ -59,10 +61,10 @@
     (send-to-all-robots comm [PAUSE]))
 
 (defn send-robot-pos [comm id pos]
-    (let [loc (:location pos)
+    (let [^Vector loc (:location pos)
           heading (:heading pos)]
         (send-to-robot comm id [POSITION (.x loc) (.y loc) (.z loc) heading])))
 
 (defn send-obs-readings [comm id readings]
-    (let [readings (mapcat (fn [r] [(.x r) (.y r)]) readings)]
+    (let [readings (mapcat (fn [^Vector r] [(.x r) (.y r)]) readings)]
         (send-to-robot comm id (cons OBS_READINGS readings))))

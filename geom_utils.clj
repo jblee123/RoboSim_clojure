@@ -6,17 +6,17 @@
 
 (defn rad-to-deg [rad] (* rad (/ deg-per-circle (* 2 Math/PI))))
 
-(defn normalize-angle [angle]
+(defn normalize-angle [^double angle]
     (cond (< angle 0) (normalize-angle (+ angle deg-per-circle))
           (>= angle deg-per-circle) (normalize-angle (- angle deg-per-circle))
           :else angle))
 
-(defn avg-angles [a1 a2]
+(defn avg-angles [^double a1 ^double a2]
     (if (<= (Math/abs (- a1 a2)) (/ deg-per-circle 2))
         (/ (+ a1 a2) 2.0)
         (normalize-angle (/ (+ a1 a2 deg-per-circle) 2.0))))
 
-(defn angle-diff [a1 a2]
+(defn angle-diff [^double a1 ^double a2]
     (let [diff (Math/abs (- a1 a2))]
         (if (<= diff (/ deg-per-circle 2.0))
             diff
@@ -31,7 +31,7 @@
 (defn create-vec [& {:keys [x y z] :or {x 0 y 0 z 0}}]
     (Vector. x y z))
 
-(defn add-vecs [v1 v2]
+(defn add-vecs [^Vector v1 ^Vector v2]
     (Vector. (+ (.x v1) (.x v2))
              (+ (.y v1) (.y v2))
              (+ (.y v1) (.y v2))))
@@ -41,22 +41,22 @@
              (apply + (map :y rest))
              (apply + (map :z rest))))
 
-(defn sub-vecs [ v & rest]
+(defn sub-vecs [^Vector v & rest]
     (Vector. (apply - (cons (.x v) (map :x rest)))
              (apply - (cons (.y v) (map :y rest)))
              (apply - (cons (.z v) (map :z rest)))))
 
-(defn mul-vec [v scalar]
+(defn mul-vec [^Vector v scalar]
     (Vector. (* (.x v) scalar)
              (* (.y v) scalar)
              (* (.z v) scalar)))
 
-(defn div-vec [v scalar]
+(defn div-vec [^Vector v scalar]
     (Vector. (/ (.x v) scalar)
              (/ (.y v) scalar)
              (/ (.z v) scalar)))
 
-(defn rotate-vec-z [v degs]
+(defn rotate-vec-z [^Vector v degs]
     (let [rads (deg-to-rad degs)
           c (Math/cos rads)
           s (Math/sin rads)
@@ -66,10 +66,10 @@
                  (+ (* x s) (* y c))
                  (.z v))))
 
-(defn get-vec-angle [v]
+(defn get-vec-angle [^Vector v]
     (normalize-angle (rad-to-deg (Math/atan2 (.y v) (.x v)))))
 
-(defn get-vec-len [v]
+(defn get-vec-len [^Vector v]
     (Math/sqrt (+ (* (.x v) (.x v))
                   (* (.y v) (.y v))
                   (* (.z v) (.z v)))))
@@ -82,11 +82,13 @@
 
 (defrecord Ray [^Vector from-vec ^Vector to-vec])
 
-(defn intersect-ray-with-circle [ray xc yc rad]
-    (let [x0 (.x (.from-vec ray))
-          y0 (.y (.from-vec ray))
-          dx (- (.x (.to-vec ray)) x0)
-          dy (- (.y (.to-vec ray)) y0)
+(defn intersect-ray-with-circle [^Ray ray xc yc rad]
+    (let [^Vector from-vec (.from-vec ray)
+          ^Vector to-vec (.to-vec ray)
+          x0 (.x from-vec)
+          y0 (.y from-vec)
+          dx (- (.x to-vec) x0)
+          dy (- (.y to-vec) y0)
           a (+ (* dx dx) (* dy dy))
           b (* 2 (+ (* x0 dx)
                     (- (* xc dx))
@@ -110,11 +112,13 @@
                                        (get-vec-len (sub-vecs v2 (.from-vec ray)))) v1 v2)
                     (if v1 v1 v2))))))
 
-(defn intersect-ray-with-segment [ray xs0 ys0 xs1 ys1]
-    (let [x0 (.x (.from-vec ray))
-          y0 (.y (.from-vec ray))
-          dxr (- (.x (.to-vec ray)) x0)
-          dyr (- (.y (.to-vec ray)) y0)
+(defn intersect-ray-with-segment [^Ray ray xs0 ys0 xs1 ys1]
+    (let [^Vector from-vec (.from-vec ray)
+          ^Vector to-vec (.to-vec ray)
+          x0 (.x from-vec)
+          y0 (.y from-vec)
+          dxr (- (.x to-vec) x0)
+          dyr (- (.y to-vec) y0)
           dxs (- xs1 xs0)
           dys (- ys1 ys0)]
           (if (and (not (zero? (- (* dxs dyr) (* dys dxr))))

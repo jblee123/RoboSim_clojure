@@ -1,5 +1,7 @@
 (ns robot.robot)
 
+(set! *warn-on-reflection* true)
+
 (use 'robot-position)
 (use 'robot.robot-interfaces)
 (use 'robot.controller)

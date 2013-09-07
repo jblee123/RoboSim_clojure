@@ -1,8 +1,11 @@
 (ns console.display
+    (:require (console.environment))
     (:import
         (java.awt Color
+                  Container
                   Dimension
                   Graphics
+                  Graphics2D
                   GridBagLayout
                   GridBagConstraints
                   Insets
@@ -10,27 +13,28 @@
                   RenderingHints
                   Toolkit)
         (java.awt.event KeyAdapter WindowAdapter KeyEvent)
-        (javax.swing JPanel JFrame)))
+        (javax.swing JPanel JFrame)
+        (console.environment Obstacle Item Wall Label)))
 
 (use 'geom-utils)
 (use 'console.environment)
 
-(defn draw-obstacle [g obs scale]
+(defn draw-obstacle [^Graphics g ^Obstacle obs scale]
     (let [[x y] (meters-to-pixels (.x obs) (.y obs) scale)
           [r _] (meters-to-pixels (.r obs) 0 scale)]
         (.setColor g Color/BLACK)
         (.fillOval g (- x r) (- y r) (* r 2) (* r 2))))
 
-(defn draw-wall [g wall scale]
+(defn draw-wall [^Graphics g ^Wall wall scale]
     (let [[x1 y1] (meters-to-pixels (.x1 wall) (.y1 wall) scale)
           [x2 y2] (meters-to-pixels (.x2 wall) (.y2 wall) scale)]
         (.setColor g Color/BLACK)
         (.drawLine g x1 y1 x2 y2)))
 
 ; not implemented yet
-(defn draw-label [g label scale] nil)
+(defn draw-label [^Graphics g ^Label label scale] nil)
 
-(defn draw-item [g obj scale]
+(defn draw-item [^Graphics g ^Item obj scale]
     (let [[x y] (meters-to-pixels (.x obj) (.y obj) scale)
           [r _] (meters-to-pixels (.r obj) 0 scale)]
         (.setColor g (.color obj))
@@ -39,7 +43,7 @@
 (defn get-color-from-string [color-name]
     (.get (.getField (Class/forName "java.awt.Color") color-name) nil))
 
-(defn draw-robot [g robot scale]
+(defn draw-robot [^Graphics g robot scale]
     (let [heading (:heading (:pos robot))
           loc (:location (:pos robot))
           points [[-0.5  0.5]
@@ -60,7 +64,7 @@
     (doseq [robot robots]
         (draw-robot g robot scale)))
 
-(defn draw-readings-for-robot [g readings scale]
+(defn draw-readings-for-robot [^Graphics g readings scale]
     (.setColor g Color/RED)
     (doseq [r readings]
         (let [[x y] (meters-to-pixels (:x r) (:y r) scale)]
@@ -70,7 +74,7 @@
     (doseq [robot-readings (vals readings)]
         (draw-readings-for-robot g robot-readings scale)))
 
-(defn draw-world [g canvas env scale robots readings]
+(defn draw-world [^Graphics2D g ^JPanel canvas env scale robots readings]
     (let [draw-entity (fn [draw-func entity-type]
                         (doseq [entity (entity-type env)] (draw-func g entity scale)))]
         (.setRenderingHint g RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON)
@@ -101,7 +105,7 @@
 
 (defn create-frame-key-listener [pause-fn]
     (proxy [KeyAdapter] []
-        (keyPressed [e]
+        (keyPressed [^KeyEvent e]
             (if (and (= (.getKeyCode e) KeyEvent/VK_P) (not (.isShiftDown e)))
                 (pause-fn)))))
 
@@ -111,11 +115,13 @@
           h (- (.getHeight screen-size) 100)
           scale (get-env-scale w h (:width env) (:height env))
           canvas (create-world-canvas env scale)
-          frame (new JFrame "Robo Sim")]
+          ^JPanel canvas_panel (:canvas canvas)
+          frame (new JFrame "Robo Sim")
+          ^Container content_pane (.getContentPane frame)]
         (.setSize frame w h)
         (.setLayout (.getContentPane frame) (new GridBagLayout))
-        (.add (.getContentPane frame)
-            (:canvas canvas)
+        (.add content_pane
+            canvas_panel
             (new GridBagConstraints 0 0 1 1 1.0 1.0
                                     GridBagConstraints/CENTER
                                     GridBagConstraints/BOTH

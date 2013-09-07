@@ -2,7 +2,9 @@
     (:import
         (java.awt Color)
         (java.awt.event ActionListener)
-        (javax.swing Timer)))
+        (javax.swing JPanel Timer)))
+
+(set! *warn-on-reflection* true)
 
 (use 'geom-utils)
 (use 'console.environment)
@@ -42,7 +44,7 @@
     (map #(egocentric-to-global robot-pos %1) readings))
 
 (defn get-display-canvas [] (get-in @the-state [:console :canvas]))
-(defn get-display-canvas-panel [] (:canvas (get-display-canvas)))
+(defn get-display-canvas-panel ^JPanel [] (:canvas (get-display-canvas)))
 (defn set-display-robots-fn [] (:set-robots (get-display-canvas)))
 (defn set-display-readings-fn [] (:set-readings (get-display-canvas)))
 
@@ -163,7 +165,7 @@
 (init-robo-sim (get-env-for-test-goto))
 
 
-(.exec (Runtime/getRuntime) "clojure -cp . robot/goto_test_robot.clj")
+(.exec (Runtime/getRuntime) "clojure -cp . -port 44444 robot/goto_test_robot.clj")
 
 
 (loop []

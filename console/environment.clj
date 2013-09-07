@@ -13,7 +13,7 @@
     Object
     (toString [o] (format "[[%.02f, %.02f], %.02f]" (.x o) (.y o) (.r o))))
 
-(defn intersect-obs-with-ray [obs ray]
+(defn intersect-obs-with-ray [^Obstacle obs ray]
     (intersect-ray-with-circle ray (.x obs) (.y obs) (.r obs)))
 
 (defrecord Item [^double x ^double y ^double r ^Color color]
@@ -24,7 +24,7 @@
     Object
     (toString [w] (format "[[%.02f, %.02f], [%.02f, %.02f]]" (.x1 w) (.y1 w) (.x2 w) (.y2 w))))
 
-(defn intersect-wall-with-ray [wall ray]
+(defn intersect-wall-with-ray [^Wall wall ray]
     (intersect-ray-with-segment ray (.x1 wall) (.y1 wall) (.x2 wall) (.y2 wall)))
 
 (defrecord Label [^double x ^double y ^String text]
