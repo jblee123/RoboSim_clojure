@@ -1,6 +1,6 @@
 (ns robo-sim
     (:import
-        (java.awt Color)
+        (java.awt Color EventQueue)
         (java.awt.event ActionListener)
         (javax.swing JPanel Timer)))
 
@@ -16,14 +16,16 @@
 (def the-state (atom nil))
 
 (defn schedule-action
-    ([f] (schedule-action f 0))
+    ([f] (EventQueue/invokeLater
+            (proxy [Runnable] [] (run [] (apply f [])))))
     ([f delay]
-        (let [timer (Timer. delay nil)]
-            (.addActionListener timer
-                (proxy [ActionListener] []
-                    (actionPerformed [e] (apply f []))))
-            (.setRepeats timer false)
-            (.start timer))))
+        (if (= delay 0) (schedule-action f)
+            (let [timer (Timer. delay nil)]
+                (.addActionListener timer
+                    (proxy [ActionListener] []
+                        (actionPerformed [e] (apply f []))))
+                (.setRepeats timer false)
+                (.start timer)))))
 
 (defn exit-robo-sim []
     (System/exit 0))
